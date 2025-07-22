@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Test de Inteligencias Múltiples</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: rgba(30,30,30,0.95);
+            border-radius: 16px;
+            box-shadow: 0 0 24px #222;
+            padding: 24px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .icons-row {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .icons-row i {
+            font-size: 2em;
+            color: #ffd700;
+            background: #222;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0 0 8px #333;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #222;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            height: 18px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700 60%, #ff9800 100%);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .question-card {
+            background: #111;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 12px #222;
+        }
+        .question {
+            font-size: 1.2em;
+            margin-bottom: 14px;
+        }
+        .answers {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .answer-btn {
+            background: #222;
+            color: #ffd700;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .answer-btn:hover, .answer-btn.selected {
+            background: #ffd700;
+            color: #222;
+        }
+        .results-section {
+            margin-top: 24px;
+            text-align: center;
+        }
+        .result-card {
+            background: #222;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 12px auto;
+            max-width: 400px;
+            box-shadow: 0 2px 12px #333;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .result-icon {
+            font-size: 2.5em;
+            color: #ffd700;
+            background: #111;
+            border-radius: 50%;
+            padding: 12px;
+            box-shadow: 0 0 8px #333;
+        }
+        .result-info {
+            text-align: left;
+        }
+        .result-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        .result-desc {
+            font-size: 1em;
+            color: #ccc;
+        }
+        .bar-chart {
+            margin: 24px auto 0 auto;
+            max-width: 400px;
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .bar-label {
+            width: 120px;
+            font-size: 0.95em;
+            color: #ffd700;
+            text-align: right;
+            margin-right: 8px;
+        }
+        .bar {
+            height: 18px;
+            background: linear-gradient(90deg, #ffd700 60%, #ff9800 100%);
+            border-radius: 8px;
+            transition: width 0.5s;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 8px;
+            }
+            .title {
+                font-size: 1.5em;
+            }
+            .icons-row i {
+                font-size: 1.3em;
+                padding: 6px;
+            }
+            .result-card {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px;
+            }
+            .bar-label {
+                width: 80px;
+                font-size: 0.85em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">Test de Inteligencias Múltiples</div>
+            <div class="icons-row">
+                <i class="fa-solid fa-book-open" title="Lingüística-Verbal"></i>
+                <i class="fa-solid fa-calculator" title="Lógico-Matemática"></i>
+                <i class="fa-solid fa-shapes" title="Espacial"></i>
+                <i class="fa-solid fa-music" title="Musical"></i>
+                <i class="fa-solid fa-running" title="Corporal-Kinestésica"></i>
+                <i class="fa-solid fa-users" title="Interpersonal"></i>
+                <i class="fa-solid fa-user" title="Intrapersonal"></i>
+                <i class="fa-solid fa-leaf" title="Naturalista"></i>
+            </div>
+        </div>
+        <div class="progress-bar"><div class="progress" id="progress"></div></div>
+        <div id="test-section"></div>
+        <div id="results-section" class="results-section" style="display:none;"></div>
+    </div>
+    <script>
+        // Inteligencias y sus datos
+        const intelligences = [
+            {
+                key: "linguistica",
+                name: "Lingüística-Verbal",
+                icon: "fa-book-open",
+                desc: "Habilidad para usar el lenguaje de manera efectiva, tanto oral como escrita."
+            },
+            {
+                key: "logico",
+                name: "Lógico-Matemática",
+                icon: "fa-calculator",
+                desc: "Capacidad para el razonamiento lógico, la resolución de problemas y el pensamiento matemático."
+            },
+            {
+                key: "espacial",
+                name: "Espacial",
+                icon: "fa-shapes",
+                desc: "Facilidad para pensar en tres dimensiones, visualizar y manipular objetos mentalmente."
+            },
+            {
+                key: "musical",
+                name: "Musical",
+                icon: "fa-music",
+                desc: "Sensibilidad para los sonidos, ritmos, tonos y música en general."
+            },
+            {
+                key: "corporal",
+                name: "Corporal-Kinestésica",
+                icon: "fa-running",
+                desc: "Destreza para controlar los movimientos del cuerpo y manejar objetos hábilmente."
+            },
+            {
+                key: "interpersonal",
+                name: "Interpersonal",
+                icon: "fa-users",
+                desc: "Capacidad para entender y relacionarse con otras personas."
+            },
+            {
+                key: "intrapersonal",
+                name: "Intrapersonal",
+                icon: "fa-user",
+                desc: "Habilidad para comprenderse a uno mismo, sus emociones y motivaciones."
+            },
+            {
+                key: "naturalista",
+                name: "Naturalista",
+                icon: "fa-leaf",
+                desc: "Sensibilidad para observar y entender la naturaleza y los seres vivos."
+            }
+        ];
+
+        // Preguntas por inteligencia
+        const questions = [
+            // Lingüística-Verbal
+            { intelligence: "linguistica", text: "Me gusta leer libros, escribir historias o poemas." },
+            { intelligence: "linguistica", text: "Me expreso con facilidad y me gusta hablar en público." },
+            { intelligence: "linguistica", text: "Aprendo mejor leyendo o escuchando explicaciones." },
+            // Lógico-Matemática
+            { intelligence: "logico", text: "Disfruto resolver acertijos, problemas matemáticos o juegos de lógica." },
+            { intelligence: "logico", text: "Me gusta analizar situaciones y buscar soluciones prácticas." },
+            { intelligence: "logico", text: "Prefiero actividades que requieren razonamiento y pensamiento crítico." },
+            // Espacial
+            { intelligence: "espacial", text: "Me resulta fácil orientarme y recordar lugares o mapas." },
+            { intelligence: "espacial", text: "Disfruto dibujar, diseñar o construir cosas." },
+            { intelligence: "espacial", text: "Puedo imaginar objetos o escenarios en mi mente con claridad." },
+            // Musical
+            { intelligence: "musical", text: "Me gusta escuchar música y reconozco ritmos fácilmente." },
+            { intelligence: "musical", text: "Toco algún instrumento o me gustaría aprender." },
+            { intelligence: "musical", text: "Recuerdo melodías y canciones con facilidad." },
+            // Corporal-Kinestésica
+            { intelligence: "corporal", text: "Practico deportes, baile o actividades físicas regularmente." },
+            { intelligence: "corporal", text: "Aprendo mejor haciendo y experimentando físicamente." },
+            { intelligence: "corporal", text: "Tengo buena coordinación y control de mi cuerpo." },
+            // Interpersonal
+            { intelligence: "interpersonal", text: "Me gusta trabajar en equipo y colaborar con otros." },
+            { intelligence: "interpersonal", text: "Entiendo fácilmente los sentimientos y necesidades de los demás." },
+            { intelligence: "interpersonal", text: "Tengo facilidad para hacer amigos y relacionarme." },
+            // Intrapersonal
+            { intelligence: "intrapersonal", text: "Reflexiono sobre mis emociones y pensamientos." },
+            { intelligence: "intrapersonal", text: "Me conozco bien y sé lo que quiero lograr." },
+            { intelligence: "intrapersonal", text: "Prefiero trabajar solo y tomar mis propias decisiones." },
+            // Naturalista
+            { intelligence: "naturalista", text: "Me interesa la naturaleza, los animales y el medio ambiente." },
+            { intelligence: "naturalista", text: "Disfruto actividades al aire libre como caminar o explorar." },
+            { intelligence: "naturalista", text: "Reconozco fácilmente plantas, animales o fenómenos naturales." }
+        ];
+
+        // Opciones de respuesta y puntaje
+        const answerOptions = [
+            { text: "Me representa", score: 2 },
+            { text: "A veces", score: 1 },
+            { text: "No me representa", score: 0 }
+        ];
+
+        // Estado del test
+        let currentQuestion = 0;
+        let answers = [];
+
+        function renderProgress() {
+            const percent = Math.round((currentQuestion / questions.length) * 100);
+            document.getElementById('progress').style.width = percent + '%';
+        }
+
+        function renderQuestion() {
+            renderProgress();
+            const section = document.getElementById('test-section');
+            section.innerHTML = '';
+            if (currentQuestion < questions.length) {
+                const q = questions[currentQuestion];
+                const intelligenceObj = intelligences.find(i => i.key === q.intelligence);
+                section.innerHTML = `
+                    <div class="question-card">
+                        <div class="question">
+                            <i class="fa-solid ${intelligenceObj.icon}" style="color:#ffd700;margin-right:8px;"></i>
+                            ${q.text}
+                        </div>
+                        <div class="answers">
+                            ${answerOptions.map((opt, idx) => `
+                                <button class="answer-btn" onclick="selectAnswer(${idx})">${opt.text}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        window.selectAnswer = function(idx) {
+            answers[currentQuestion] = idx;
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        };
+
+        function showResults() {
+            document.getElementById('test-section').style.display = 'none';
+            document.getElementById('progress').style.width = '100%';
+            document.getElementById('results-section').style.display = 'block';
+
+            // Calcular puntajes por inteligencia
+            const scores = {};
+            intelligences.forEach(i => scores[i.key] = 0);
+            questions.forEach((q, idx) => {
+                const ansIdx = answers[idx];
+                if (typeof ansIdx === 'number') {
+                    scores[q.intelligence] += answerOptions[ansIdx].score;
+                }
+            });
+
+            // Encontrar las inteligencias predominantes (máximo puntaje)
+            const maxScore = Math.max(...Object.values(scores));
+            const predominant = intelligences.filter(i => scores[i.key] === maxScore);
+
+            // Mostrar tarjetas de resultado
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.innerHTML = `
+                <h2>Resultado</h2>
+                <div>
+                    ${predominant.map(i => `
+                        <div class="result-card">
+                            <div class="result-icon"><i class="fa-solid ${i.icon}"></i></div>
+                            <div class="result-info">
+                                <div class="result-name">${i.name}</div>
+                                <div class="result-desc">${i.desc}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <h3 style="margin-top:32px;">Tus inteligencias en detalle</h3>
+                <div class="bar-chart">
+                    ${intelligences.map(i => {
+                        const percent = Math.round((scores[i.key] / (3*2)) * 100); // 3 preguntas x 2 puntos máx
+                        return `
+                            <div class="bar-row">
+                                <div class="bar-label"><i class="fa-solid ${i.icon}"></i> ${i.name}</div>
+                                <div class="bar" style="width:${percent}%;"></div>
+                                <div style="margin-left:8px;color:#ffd700;">${scores[i.key]}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <button onclick="restartTest()" class="answer-btn" style="margin-top:24px;">Volver a empezar</button>
+            `;
+        }
+
+        window.restartTest = function() {
+            currentQuestion = 0;
+            answers = [];
+            document.getElementById('test-section').style.display = 'block';
+            document.getElementById('results-section').style.display = 'none';
+            renderQuestion();
+            renderProgress();
+        };
+
+        // Inicializar
+        renderQuestion();
+        renderProgress();
+    </script>
+</body>
+</html>
